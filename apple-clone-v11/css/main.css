@@ -79,8 +79,9 @@ body.before-load {
 	margin-left: 2em;
 }
 .scroll-section {
-	/* position: relative; */
+	position: relative;
 	padding-top: 50vh;
+    border: 5px solid red;
 }
 #scroll-section-0 h1 {
 	/* position: relative; */
@@ -169,8 +170,9 @@ body.before-load {
 	background: darkorange;
 }
 .sticky-elem {
-	/* display: none; */
-	/* position: fixed; */
+	display: none;
+	position: fixed;
+    top: 0;
 	left: 0;
 	width: 100%;
 }
@@ -179,12 +181,12 @@ body.before-load {
 #show-scene-2 #scroll-section-2 .sticky-elem,
 #show-scene-3 #scroll-section-3 .sticky-elem {
 	display: block;
-	will-change: transform, opacity;
+	/* will-change: transform, opacity; */
 }
-.scroll-effect-end .sticky-elem {
-	/* 스크롤 효과가 모두 끝나고, 아래 일반 콘텐츠 영역에서는 sticky-elem들을 모두 안보이도록 */
+/* .scroll-effect-end .sticky-elem {
+	스크롤 효과가 모두 끝나고, 아래 일반 콘텐츠 영역에서는 sticky-elem들을 모두 안보이도록
 	display: none !important;
-}
+} */
 .sticky-elem-canvas {
 	top: 0;
 	height: 100%;
