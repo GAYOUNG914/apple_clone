@@ -19,7 +19,7 @@
                 messageD: document.querySelector('#scroll-section-0 .main-message.d'),
             },
             values:{ //시점, 불투명도 조작
-                messageA_opacity: [200, 700],
+                messageA_opacity: [0, 1],
             }
         },
         {
@@ -66,7 +66,7 @@
         let rv;
         let scrollRatio = currentYOffset / sceneInfo[currentScene].scrollHeight;
 
-        rv = parseInt(scrollRatio * (values[1] - values[0]) + values[0]);
+        rv = scrollRatio * (values[1] - values[0]) + values[0];
 
         return rv;
 
@@ -80,10 +80,8 @@
         // console.log(currentYOffset);
         switch (currentScene){
             case 0:
-                let messageA_opacity_0 = values.messageA_opacity[0];
-                let messageA_opacity_1 = values.messageA_opacity[1];
+                let messageA_opacity_in = calcValues(values.messageA_opacity, currentYOffset);
 
-                console.log(calcValues(values.messageA_opacity, currentYOffset));
                 break;
 
             case 1:
