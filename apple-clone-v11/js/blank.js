@@ -184,6 +184,9 @@
         switch (currentScene) {
             case 0:
                 // console.log('0 play');
+                let sequence = calcValues(values.imageSequence, currentYOffset);
+                console.log(sequence);
+
                 if (scrollRatio <= 0.22) {
                     // in
                     objs.messageA.style.opacity = calcValues(values.messageA_opacity_in, currentYOffset);
