@@ -81,10 +81,10 @@ body.before-load {
 .scroll-section {
 	position: relative;
 	padding-top: 50vh;
-    border: 5px solid red;
+    /* border: 5px solid red; */
 }
 #scroll-section-0 h1 {
-	/* position: relative; */
+	position: relative;
 	top: -10vh;
 	z-index: 5;
 	font-size: 4rem;
@@ -189,12 +189,11 @@ body.before-load {
 .sticky-elem-canvas {
 	top: 0;
 	height: 100%;
-    background: #ccc;
 }
 .sticky-elem-canvas canvas {
 	position: absolute;
-	top: 0;
-	left: 0;
+	top: 50%;
+	left: 50%;
 }
 #scroll-section-3 {
 	display: flex;

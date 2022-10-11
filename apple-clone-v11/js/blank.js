@@ -1,5 +1,5 @@
 (()=>{
-
+// debugger;
 
     let yOffset = 0; // window.pageOffset 대신 쓸 수 있는 변수
     let prevScrollHeight = 0; // 현재 스크롤 위치(yOffset)보다 이전에 위치한 스크롤 섹션들의 스크롤 높이값의 합
@@ -25,6 +25,7 @@
             values: {
                 videoImageCount: 300,
                 imageSequence: [0, 299],
+                canvas_opacity: [1,0, {start: 0.9, end: 1}],
                 messageA_opacity_in: [0, 1, { start: 0.1, end: 0.2 }],
                 messageB_opacity_in: [0, 1, { start: 0.3, end: 0.4 }],
                 messageC_opacity_in: [0, 1, { start: 0.5, end: 0.6 }],
@@ -64,9 +65,16 @@
                 messageB: document.querySelector('#scroll-section-2 .b'),
                 messageC: document.querySelector('#scroll-section-2 .c'),
                 pinB: document.querySelector('#scroll-section-2 .b .pin'),
-                pinC: document.querySelector('#scroll-section-2 .c .pin')
+                pinC: document.querySelector('#scroll-section-2 .c .pin'),
+                canvas: document.querySelector('#video-canvas-1'),
+                context: document.querySelector('#video-canvas-1').getContext('2d'),
+                videoImages: []
             },
             values: {
+                videoImageCount: 960,
+                imageSequence: [0, 959],
+                canvas_opacity_in: [0,1,{ start: 0, end: 0.1 }],
+                canvas_opacity_out: [1,0,{ start: 0.95, end: 1 }],
                 messageA_translateY_in: [20, 0, { start: 0.15, end: 0.2 }],
                 messageB_translateY_in: [30, 0, { start: 0.5, end: 0.55 }],
                 messageC_translateY_in: [30, 0, { start: 0.72, end: 0.77 }],
@@ -107,11 +115,16 @@
         for(let i = 0; i < sceneInfo[0].values.videoImageCount; i++){
             // imgElem = document.createElement('img')
             imgElem = new Image();
-            imgElem.src = `./video/001/IMG_${6726 + i}.JPG`
+            imgElem.src = `./video/001/IMG_${6726 + i}.JPG`;
             sceneInfo[0].objs.videoImages.push(imgElem);
 
         }
-        console.log(sceneInfo[0].objs.videoImages)
+        let imgElem2;
+        for(let i = 0; i < sceneInfo[2].values.videoImageCount; i++){
+            imgElem2 = new Image();
+            imgElem2.src = `./video/002/IMG_${7027 + i}.JPG`;
+            sceneInfo[2].objs.videoImages.push(imgElem2);
+        }
     }
     setCanvasImages();
 
@@ -138,9 +151,9 @@
 		}
 		document.body.setAttribute('id', `show-scene-${currentScene}`);
 
-		// const heightRatio = window.innerHeight / 1080;
-		// sceneInfo[0].objs.canvas.style.transform = `translate3d(-50%, -50%, 0) scale(${heightRatio})`;
-		// sceneInfo[2].objs.canvas.style.transform = `translate3d(-50%, -50%, 0) scale(${heightRatio})`;
+		const heightRatio = window.innerHeight / 1080;
+		sceneInfo[0].objs.canvas.style.transform = `translate3d(-50%, -50%, 0) scale(${heightRatio})`;
+		sceneInfo[2].objs.canvas.style.transform = `translate3d(-50%, -50%, 0) scale(${heightRatio})`;
 	}
 
     function calcValues(values, currentYOffset){
@@ -149,22 +162,21 @@
         const scrollHeight = sceneInfo[currentScene].scrollHeight;
         const scrollRatio = currentYOffset / scrollHeight;
 
-        if(values.legnth === 3 ){
+        if(values.length === 3 ){
             //섹션 안의 특정 구간에서 인터랙션이 있어야 하는 경우(start ~ end 사이에 애니메이션 실행)
             //아니 이걸 어케 생각하셨지 후...
             //우왕... 그림그려서 생각하면 쉬울 수도 있겠네.. 후...후후호호후후..ㅠㅠ
             const partScrollStart = values[2].start * scrollHeight;
-            const partScrollEnd= values[2].end * scrollHeight;
-            const partScrollHeight = partScrollEnd - partScrollStart;
+			const partScrollEnd = values[2].end * scrollHeight;
+			const partScrollHeight = partScrollEnd - partScrollStart;
 
-            if (currentYOffset >= partScrollStart && currentYOffset <= partScrollEnd) {
+			if (currentYOffset >= partScrollStart && currentYOffset <= partScrollEnd) {
 				rv = (currentYOffset - partScrollStart) / partScrollHeight * (values[1] - values[0]) + values[0];
 			} else if (currentYOffset < partScrollStart) {
 				rv = values[0];
 			} else if (currentYOffset > partScrollEnd) {
 				rv = values[1];
 			}
-
 
         }else{
             rv = scrollRatio * (values[1] - values[0]) + values[0];
@@ -186,6 +198,9 @@
                 // console.log('0 play');
                 let sequence = Math.round(calcValues(values.imageSequence, currentYOffset));
                 objs.context.drawImage(objs.videoImages[sequence], 0, 0);
+
+                objs.canvas.style.opacity = calcValues(values.canvas_opacity, currentYOffset);
+
 
                 if (scrollRatio <= 0.22) {
                     // in
@@ -230,7 +245,16 @@
                 break;
     
             case 2:
-                // console.log('2 play');
+                let sequence2 = Math.round(calcValues(values.imageSequence, currentYOffset));
+                objs.context.drawImage(objs.videoImages[sequence2], 0, 0);
+
+                if(scrollRatio <= 0.5){
+                    objs.canvas.style.opacity = calcValues(values.canvas_opacity_in, currentYOffset)
+                }else {
+                    objs.canvas.style.opacity = calcValues(values.canvas_opacity_out, currentYOffset)
+                }
+                
+
                 if (scrollRatio <= 0.25) {
                     // in
                     objs.messageA.style.opacity = calcValues(values.messageA_opacity_in, currentYOffset);
@@ -304,8 +328,6 @@
         if (enterNewScene) return;//이상한 값 들어갈 때 return되면서 playAnimation()이 한 턴 걸러짐
         playAnimation();
 
-
-
     }
 
     window.addEventListener('scroll',()=>{
@@ -313,7 +335,11 @@
         scrollLoop();
     });
 
-    window.addEventListener('load',setLayout);
+    window.addEventListener('load',()=>{
+        setLayout();
+        sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
+        
+    });
     window.addEventListener('resize',setLayout);
 
 })();
