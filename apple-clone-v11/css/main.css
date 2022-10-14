@@ -195,6 +195,11 @@ body.before-load {
 	top: 50%;
 	left: 50%;
 }
+
+.image-blend-canvas{
+    background: blue;
+}
+
 #scroll-section-3 {
 	display: flex;
 	flex-direction: column;
