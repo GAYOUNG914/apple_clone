@@ -114,6 +114,7 @@
             values: {
                 rect1X: [ 0, 0, { start: 0, end: 0 }],    //디폴트 값 0 으로 놔둔거임
                 rect2X: [ 0, 0, { start: 0, end: 0 }],    
+                blendHeight: [0,0,{start:0,end:0}],
                 rectStartY: 0,
             }
         }
@@ -181,8 +182,6 @@
 
         if(values.length === 3 ){
             //섹션 안의 특정 구간에서 인터랙션이 있어야 하는 경우(start ~ end 사이에 애니메이션 실행)
-            //아니 이걸 어케 생각하셨지 후...
-            //우왕... 그림그려서 생각하면 쉬울 수도 있겠네.. 후...후후호호후후..ㅠㅠ
             const partScrollStart = values[2].start * scrollHeight;
 			const partScrollEnd = values[2].end * scrollHeight;
 			const partScrollHeight = partScrollEnd - partScrollStart;
@@ -360,18 +359,16 @@
                 // console.log('3 play');
                 let step = 0;
                 // 가로/세로 모두 꽉 차게 하기 위해 여기서 세팅(계산필요)
-                const widthRatio = window.innerWidth/ objs.canvas.width;
+                const widthRatio = window.innerWidth / objs.canvas.width;
                 const heightRatio = window.innerHeight / objs.canvas.height;
                 let canvasScaleRatio;
 
                 if(widthRatio <= heightRatio) {
                     //캔버스보다 브라우저 창이 홀쭉한 경우
                     canvasScaleRatio = heightRatio;
-                    console.log('height로결정')
                 }else{
                     //브라우저 창이 캔버스보다 홀쭉한 경우
                     canvasScaleRatio = widthRatio;
-                    console.log('width로결정')
                 }
 
                 objs.canvas.style.transform = `scale(${canvasScaleRatio})`
@@ -379,7 +376,7 @@
                 objs.context.drawImage(objs.images[0], 0, 0);
 
                 //캔버스 사이즈에 맞춰 가정한 Innerwidth 와 innerheight
-                const recalculatedInnerWidth = window.innerWidth / canvasScaleRatio;
+                const recalculatedInnerWidth = document.body.offsetWidth / canvasScaleRatio;
                 const reclalculatedInnerHeight = window.innerHeight / canvasScaleRatio;
 
                 if(!values.rectStartY){
@@ -417,6 +414,18 @@
                 }else{ 
                     step =2;
                     //이미지 블렌드
+                    // objs.context.drawImage(img, x, y, width, height);
+                    values.blendHeight[0] = 0;
+                    values.blendHeight[1] = objs.canvas.height;
+                    values.blendHeight[2].start = values.rect1X[2].end;
+                    values.blendHeight[2].end = values.blendHeight[2].start + 0.2;
+                    const blendHeight = calcValues(values.blendHeight, currentYOffset)
+
+                    objs.context.drawImage(objs.images[1], 
+                        0, objs.canvas.height - blendHeight, objs.canvas.width, blendHeight,
+                        0, objs.canvas.height - blendHeight, objs.canvas.width, blendHeight
+                    );
+
                     objs.canvas.classList.add('sticky');
                     objs.canvas.style.top = `${(objs.canvas.height - objs.canvas.height * canvasScaleRatio) / 2}px`;
                 }
