@@ -1,7 +1,5 @@
 @import "default.css";
 
-
-
 html {
 	font-family: 'Noto Sans KR', sans-serif;
 	font-size: 14px;
@@ -196,8 +194,10 @@ body.before-load {
 	left: 50%;
 }
 
-.image-blend-canvas{
-    background: blue;
+.image-blend-canvas.sticky{
+    position: fixed;
+    top: 0;
+    z-index: 10;
 }
 
 #scroll-section-3 {
