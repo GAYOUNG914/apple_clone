@@ -115,6 +115,7 @@
                     rect1X: [ 0, 0, { start: 0, end: 0 }],    //디폴트 값 0 으로 놔둔거임
                     rect2X: [ 0, 0, { start: 0, end: 0 }],    
                     blendHeight: [0,0,{start:0,end:0}],
+                    canvas_scale: [0,0,{start:0,end:0}],
                     rectStartY: 0,
                 }
             }
@@ -421,13 +422,23 @@
                         values.blendHeight[2].end = values.blendHeight[2].start + 0.2;
                         const blendHeight = calcValues(values.blendHeight, currentYOffset)
     
-                        objs.context.drawImage(objs.images[1], 
+                        objs.context.drawImage(objs.images[1],
                             0, objs.canvas.height - blendHeight, objs.canvas.width, blendHeight,
                             0, objs.canvas.height - blendHeight, objs.canvas.width, blendHeight
                         );
     
                         objs.canvas.classList.add('sticky');
                         objs.canvas.style.top = `-${(objs.canvas.height - objs.canvas.height * canvasScaleRatio) / 2}px`;
+
+                        if(scrollRatio > values.blendHeight[2].end){
+                            values.canvas_scale[0] = canvasScaleRatio;
+                            values.canvas_scale[1] = document.body.offsetWidth / (1.5 * objs.canvas.width); //분모가 커지게 하기위해 임의의 수를 곱한거임
+                            // console.log(values.canvas_scale[0], values.canvas_scale[1]); //왼쪽에서 오른쪽 값으로 스케일 변하게 할거임
+                            values.canvas_scale[2].start = values.blendHeight[2].end;
+                            values.canvas_scale[2].end = values.canvas_scale[2].start + 0.2;
+
+                            objs.canvas.style.transform = `scale(${calcValues(values.canvas_scale, currentYOffset)})`;
+                        }
                     }
     
                     break;
