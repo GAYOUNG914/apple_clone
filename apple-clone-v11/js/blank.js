@@ -5,6 +5,10 @@
         let prevScrollHeight = 0; // 현재 스크롤 위치(yOffset)보다 이전에 위치한 스크롤 섹션들의 스크롤 높이값의 합
         let currentScene = 0; // 현재 활성화된(눈 앞에 보이고 있는) scene(scroll-seciton)
         let enterNewScene = false; //새로운 씬이 시작되는 순간 true
+        let acc = 0.1;
+        let delayedYOffset = 0;
+        let rafId;
+        let rafState;
     
         const sceneInfo = [
             {
@@ -147,7 +151,6 @@
             }
             console.log(sceneInfo[3].objs.images)
         }
-        setCanvasImages();
 
         function checkMenu() {
             if(yOffset > document.querySelector('.global-nav-links').getBoundingClientRect().height){
@@ -223,8 +226,8 @@
             switch (currentScene) {
                 case 0:
                     // console.log('0 play');
-                    let sequence = Math.round(calcValues(values.imageSequence, currentYOffset));
-                    objs.context.drawImage(objs.videoImages[sequence], 0, 0);
+                    // let sequence = Math.round(calcValues(values.imageSequence, currentYOffset));
+                    // objs.context.drawImage(objs.videoImages[sequence], 0, 0);
     
                     objs.canvas.style.opacity = calcValues(values.canvas_opacity, currentYOffset);
     
@@ -272,8 +275,8 @@
                     break;
         
                 case 2:
-                    let sequence2 = Math.round(calcValues(values.imageSequence, currentYOffset));
-                    objs.context.drawImage(objs.videoImages[sequence2], 0, 0);
+                    // let sequence2 = Math.round(calcValues(values.imageSequence, currentYOffset));
+                    // objs.context.drawImage(objs.videoImages[sequence2], 0, 0);
     
                     if(scrollRatio <= 0.5){
                         objs.canvas.style.opacity = calcValues(values.canvas_opacity_in, currentYOffset)
@@ -469,8 +472,8 @@
             }
         }
     
-        function scrollLoop(){
-            enterNewScene = false;
+        function scrollLoop(){ 
+            enterNewScene = false; //scene 바뀔 때 잠깐 playanimation 함수를 패스
             prevScrollHeight = 0;//스크롤이벤트 일어날 때 마다 누적이 안되게끔 초기화
     
             for(let i = 0; i < currentScene; i++){
@@ -478,7 +481,7 @@
             }
     
             //currentScene 정해주기! 와! 어케 이런 생각을!
-            if (yOffset > prevScrollHeight + sceneInfo[currentScene].scrollHeight) {
+            if (delayedYOffset > prevScrollHeight + sceneInfo[currentScene].scrollHeight) {
                 enterNewScene = true;
                 if (currentScene === sceneInfo.length - 1) {
                     document.body.classList.add('scroll-effect-end');
@@ -489,7 +492,7 @@
                 document.body.setAttribute('id', `show-scene-${currentScene}`);
             }
     
-            if (yOffset < prevScrollHeight) {
+            if (delayedYOffset < prevScrollHeight) {
                 enterNewScene = true;
                 // 브라우저 바운스 효과로 인해 마이너스가 되는 것을 방지(모바일)
                 if (currentScene === 0) return;
@@ -501,11 +504,42 @@
             playAnimation();
     
         }
+
+        function loop(){
+            delayedYOffset = delayedYOffset + (yOffset - delayedYOffset) * acc;
+
+            if(!enterNewScene){ //새로 씬 들어가는 순간이 아닐 때만 실행
+                if(currentScene === 0 || currentScene === 2){
+                    const currentYOffset = delayedYOffset - prevScrollHeight;
+                    const objs = sceneInfo[currentScene].objs;
+                    const values = sceneInfo[currentScene].values;
+                    let sequence = Math.round(calcValues(values.imageSequence, currentYOffset));
+
+                    if(objs.videoImages[sequence]){
+                        objs.context.drawImage(objs.videoImages[sequence], 0, 0);
+                    }
+                }
+            }
+            
+
+            rafId = requestAnimationFrame(loop);
+
+            if (Math.abs(yOffset - delayedYOffset) < 1 ){
+                cancelAnimationFrame(rafId);
+                rafState = false;
+            }
+        }
+
     
         window.addEventListener('scroll',()=>{
             yOffset = window.pageYOffset;
             scrollLoop();
             checkMenu();
+
+            if(!rafState){
+                rafId = requestAnimationFrame(loop);
+                rafState = true;
+            }
         });
     
         window.addEventListener('load',()=>{
@@ -513,6 +547,13 @@
             sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
             
         });
-        window.addEventListener('resize',setLayout);
-    
+        window.addEventListener('resize',() => {
+            if(window.innerWidth > 600){
+                setLayout();
+            }
+        });
+        window.addEventListener('orientationchange', setLayout);
+        
+        setCanvasImages();
+
     })();
