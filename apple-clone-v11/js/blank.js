@@ -116,6 +116,8 @@
                     rect2X: [ 0, 0, { start: 0, end: 0 }],    
                     blendHeight: [0,0,{start:0,end:0}],
                     canvas_scale: [0,0,{start:0,end:0}],
+                    canvasCaption_opacity: [0, 1, {start: 0, end: 0}],
+                    canvasCaption_translateY: [20, 0, {start: 0, end: 0}],
                     rectStartY: 0,
                 }
             }
@@ -146,6 +148,14 @@
             console.log(sceneInfo[3].objs.images)
         }
         setCanvasImages();
+
+        function checkMenu() {
+            if(yOffset > document.querySelector('.global-nav-links').getBoundingClientRect().height){
+                document.body.classList.add('local-nav-sticky');
+            }else{
+                document.body.classList.remove('local-nav-sticky');
+            }
+        }
     
         function setLayout() {
             // 각 스크롤 섹션의 높이 세팅
@@ -419,7 +429,7 @@
                         values.blendHeight[0] = 0;
                         values.blendHeight[1] = objs.canvas.height;
                         values.blendHeight[2].start = values.rect1X[2].end;
-                        values.blendHeight[2].end = values.blendHeight[2].start + 0.2;
+                        values.blendHeight[2].end = values.blendHeight[2].start + 0.2; //전체 스크롤 구간에서 blendHeight 애니메이션을 위한 20퍼센트 구간
                         const blendHeight = calcValues(values.blendHeight, currentYOffset)
     
                         objs.context.drawImage(objs.images[1],
@@ -435,9 +445,23 @@
                             values.canvas_scale[1] = document.body.offsetWidth / (1.5 * objs.canvas.width); //분모가 커지게 하기위해 임의의 수를 곱한거임
                             // console.log(values.canvas_scale[0], values.canvas_scale[1]); //왼쪽에서 오른쪽 값으로 스케일 변하게 할거임
                             values.canvas_scale[2].start = values.blendHeight[2].end;
-                            values.canvas_scale[2].end = values.canvas_scale[2].start + 0.2;
+                            values.canvas_scale[2].end = values.canvas_scale[2].start + 0.2;//전체 스크롤 구간에서 canvas_scale 애니메이션을 위한 20퍼센트 구간
 
                             objs.canvas.style.transform = `scale(${calcValues(values.canvas_scale, currentYOffset)})`;
+                            objs.canvas.style.marginTop = 0;
+                        }
+
+                        if(scrollRatio > values.canvas_scale[2].end && values.canvas_scale[2].end > 0){
+                            objs.canvas.classList.remove('sticky');
+                            objs.canvas.style.marginTop = `${scrollHeight * 0.4}px`; //css에서 타코식(-)으로 된 속성 이름은 자스에서 낙타식으로 바꿔주면 됨
+
+                            values.canvasCaption_opacity[2].start = values.canvas_scale[2].end;
+                            values.canvasCaption_opacity[2].end = values.canvasCaption_opacity[2].start + 0.1; //전체 스크롤에서 10퍼센트구간만 canvasCation 애니메이션 스크롤로 사용
+                            objs.canvasCaption.style.opacity = calcValues(values.canvasCaption_opacity, currentYOffset);
+                            values.canvasCaption_translateY[2].start = values.canvasCaption_opacity[2].start
+                            values.canvasCaption_translateY[2].end = values.canvasCaption_opacity[2].end;
+                            objs.canvasCaption.style.transform = `translate3d(0, ${calcValues(values.canvasCaption_translateY, currentYOffset)}%, 0)`;
+                            // console.log(calcValues(values.canvasCaption_opacity, currentYOffset))
                         }
                     }
     
@@ -481,6 +505,7 @@
         window.addEventListener('scroll',()=>{
             yOffset = window.pageYOffset;
             scrollLoop();
+            checkMenu();
         });
     
         window.addEventListener('load',()=>{

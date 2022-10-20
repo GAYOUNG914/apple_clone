@@ -154,7 +154,7 @@ body.before-load {
 }
 .canvas-caption {
 	max-width: 1000px;
-	/* margin: -24rem auto 0; */
+	margin: -16rem auto 0;
 	padding: 0 1rem;
 	font-size: 1.2rem;
 	color: #888;
