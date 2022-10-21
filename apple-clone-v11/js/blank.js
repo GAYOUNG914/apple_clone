@@ -330,11 +330,9 @@
                         if(widthRatio <= heightRatio) {
                             //캔버스보다 브라우저 창이 홀쭉한 경우
                             canvasScaleRatio = heightRatio;
-                            console.log('height로결정')
                         }else{
                             //브라우저 창이 캔버스보다 홀쭉한 경우
                             canvasScaleRatio = widthRatio;
-                            console.log('width로결정')
                         }
     
                         objs.canvas.style.transform = `scale(${canvasScaleRatio})`
@@ -543,16 +541,21 @@
         });
     
         window.addEventListener('load',()=>{
+            document.body.classList.remove('before-load');
             setLayout();
             sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
             
         });
         window.addEventListener('resize',() => {
-            if(window.innerWidth > 600){
+            if(window.innerWidth > 900){
                 setLayout();
             }
+            sceneInfo[3].values.rectStartY = 0;
         });
         window.addEventListener('orientationchange', setLayout);
+        document.querySelector('.loading').addEventListener('transitionend', (e) => {
+            document.body.removeChild(e.currentTarget);
+        })
         
         setCanvasImages();
 

@@ -21,6 +21,7 @@ a {
 body.before-load {
 	overflow: hidden;
 }
+
 .container {
 	/* iPhone 가로 스크롤 방지 */
 	overflow-x: hidden;
@@ -198,6 +199,48 @@ body.before-load {
     position: fixed;
     top: 0;
     z-index: 10;
+}
+
+.loading{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: 100;
+    background: white;
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.before-load .loading{
+    opacity: 1;
+}
+
+@keyframes loading-spin {
+    100% {transform: rotate(360deg)}
+}
+
+.loading-circle{
+    width: 54px;
+    height: 54px;
+    animation: loading-spin 1s infinite;
+}
+
+@keyframes loading-circle-ani {
+    0%{stroke-dashoffset: 157;}
+    75%{stroke-dashoffset: -147;}
+    100%{stroke-dashoffset: -157;}
+}
+
+.loading-circle circle{
+    stroke: black;
+    stroke-width: 4px;
+    /* document.querySelector('.loading-circle circle').getTotalLength() 로 총 길이를 알 수 있다*/
+    stroke-dasharray: 157;
+    stroke-dashoffset: -157;
+    fill: transparent;
+    animation: loading-circle-ani 1s infinite;
 }
 
 #scroll-section-3 {
